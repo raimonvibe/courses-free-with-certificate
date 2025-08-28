@@ -399,7 +399,7 @@ export default function Home() {
               {darkMode ? (
                 <Sun className="w-5 h-5 text-yellow-500" />
               ) : (
-                <Moon className="w-5 h-5 text-gray-900" />
+                <Moon className="w-5 h-5 text-gray-950" />
               )}
             </button>
           </div>
@@ -413,12 +413,12 @@ export default function Home() {
             </h2>
           </div>
           
-          <p className="text-lg text-gray-900 dark:text-gray-300 mt-6 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-950 dark:text-gray-300 mt-6 max-w-3xl mx-auto">
             A curated collection of completely free software development courses that offer certificates upon completion. 
             All courses are organized by topic and cover various aspects of software development.
           </p>
           
-          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-800 dark:text-gray-400">
+          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-950 dark:text-gray-400">
             <BookOpen className="w-4 h-4" />
             <span>{courseCategories.reduce((total, category) => total + category.courses.length, 0)} courses available</span>
           </div>
@@ -431,7 +431,7 @@ export default function Home() {
                 <div className={`p-3 rounded-xl bg-gradient-to-r ${category.gradient} text-white shadow-lg`}>
                   {category.icon}
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h3 className="text-3xl font-bold text-gray-950 dark:text-white">
                   {category.title}
                 </h3>
               </div>
@@ -446,7 +446,7 @@ export default function Home() {
                     
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
-                        <h4 className="text-xl font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <h4 className="text-xl font-semibold text-gray-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {course.title}
                         </h4>
                         <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-shrink-0 ml-2" />
@@ -454,14 +454,14 @@ export default function Home() {
                       
                       <div className="space-y-3 mb-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Provider:</span>
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Provider:</span>
                           <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">{course.provider}</span>
                         </div>
                         
                         {course.duration && (
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Duration:</span>
-                            <span className="text-sm text-gray-700 dark:text-gray-300">{course.duration}</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Duration:</span>
+                            <span className="text-sm text-gray-800 dark:text-gray-300">{course.duration}</span>
                           </div>
                         )}
                         
@@ -469,7 +469,7 @@ export default function Home() {
                           {course.topics.map((topic, topicIndex) => (
                             <span
                               key={topicIndex}
-                              className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
+                              className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-full"
                             >
                               {topic}
                             </span>
@@ -477,7 +477,7 @@ export default function Home() {
                         </div>
                       </div>
                       
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      <p className="text-sm text-gray-700 dark:text-gray-400 mb-4">
                         {course.description}
                       </p>
                       
