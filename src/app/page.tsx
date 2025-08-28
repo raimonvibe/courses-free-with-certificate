@@ -399,7 +399,7 @@ export default function Home() {
               {darkMode ? (
                 <Sun className="w-5 h-5 text-yellow-500" />
               ) : (
-                <Moon className="w-5 h-5 text-gray-600" />
+                <Moon className="w-5 h-5 text-gray-900" />
               )}
             </button>
           </div>
@@ -413,12 +413,12 @@ export default function Home() {
             </h2>
           </div>
           
-          <p className="text-lg text-gray-600 dark:text-gray-300 mt-6 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-900 dark:text-gray-300 mt-6 max-w-3xl mx-auto">
             A curated collection of completely free software development courses that offer certificates upon completion. 
             All courses are organized by topic and cover various aspects of software development.
           </p>
           
-          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-800 dark:text-gray-400">
             <BookOpen className="w-4 h-4" />
             <span>{courseCategories.reduce((total, category) => total + category.courses.length, 0)} courses available</span>
           </div>
@@ -431,7 +431,7 @@ export default function Home() {
                 <div className={`p-3 rounded-xl bg-gradient-to-r ${category.gradient} text-white shadow-lg`}>
                   {category.icon}
                 </div>
-                <h3 className="text-3xl font-bold text-gray-800 dark:text-white">
+                <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
                   {category.title}
                 </h3>
               </div>
@@ -504,7 +504,7 @@ export default function Home() {
               Start Your Learning Journey Today
             </p>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
+          <p className="text-gray-900 dark:text-gray-400 text-sm">
             All courses listed are completely free and offer certificates upon completion.
             Click any course link to get started immediately.
           </p>
