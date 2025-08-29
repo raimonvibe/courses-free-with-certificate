@@ -203,12 +203,12 @@ export default function Home() {
           description: "Completely free with completion certificate"
         },
         {
-          title: "Implement CI/CD with Azure Pipelines",
-          provider: "Microsoft Learn",
-          topics: ["Continuous Integration", "Continuous Deployment", "Azure DevOps"],
-          duration: "4 hours",
-          url: "https://learn.microsoft.com/en-us/training/paths/implement-ci-cd-azure-pipelines/",
-          description: "Completely free with completion certificate"
+          "title": "Define and implement continuous integration",
+          "provider": "Microsoft Learn",
+          "topics": ["Continuous Integration", "Continuous Deployment", "Azure DevOps"],
+          "duration": "4 hours",
+          "url": "https://learn.microsoft.com/en-us/training/paths/az-400-define-implement-continuous-integration/",
+          "description": "Completely free with completion certificate"
         }
       ]
     },
