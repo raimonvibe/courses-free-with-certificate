@@ -294,12 +294,12 @@ export default function Home() {
       gradient: "from-pink-500 to-rose-600",
       courses: [
         {
-          title: "Choose an Agile approach to software development",
-          provider: "Microsoft Learn",
-          topics: ["Agile Methodology", "Software Development", "Project Management"],
-          duration: "40 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/choose-an-agile-approach/",
-          description: "Completely free with completion certificate"
+          "title": "Plan for Agile at scale",
+          "provider": "Microsoft Learn",
+          "topics": ["Agile Methodology", "Software Development", "Project Management"],
+          "duration": "40 minutes",
+          "url": "https://learn.microsoft.com/en-us/training/modules/choose-an-agile-approach/",
+          "description": "Completely free with completion certificate"
         },
         {
           title: "Manage Agile software delivery plans across teams",
