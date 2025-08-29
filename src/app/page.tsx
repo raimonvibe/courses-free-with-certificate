@@ -293,22 +293,22 @@ export default function Home() {
       icon: <Users className="w-6 h-6" />,
       gradient: "from-pink-500 to-rose-600",
       courses: [
-        {
-          "title": "Plan for Agile at scale",
-          "provider": "Microsoft Learn",
-          "topics": ["Agile Methodology", "Software Development", "Project Management"],
-          "duration": "40 minutes",
-          "url": "https://learn.microsoft.com/en-us/training/modules/choose-an-agile-approach/",
-          "description": "Completely free with completion certificate"
-        },
-        {
-          "title": "Manage Agile software delivery plans across teams",
-          "provider": "Microsoft Learn",
-          "topics": ["Team Management", "Agile Planning", "Software Delivery"],
-          "duration": "43 minutes",
-          "url": "https://learn.microsoft.com/en-us/training/modules/manage-delivery-plans/",
-          "description": "Completely free with completion certificate"
-        }
+      {
+        "title": "Choose an Agile approach to software development",
+        "provider": "Microsoft Learn",
+        "topics": ["Agile Methodology", "Software Development", "Project Management"],
+        "duration": "40 minutes",
+        "url": "https://learn.microsoft.com/en-us/training/modules/choose-an-agile-approach/",
+        "description": "Completely free with completion badge"
+      },
+      {
+        "title": "Manage Agile software delivery plans across teams",
+        "provider": "Microsoft Learn",
+        "topics": ["Team Management", "Agile Planning", "Software Delivery"],
+        "duration": "43 minutes",
+        "url": "https://learn.microsoft.com/en-us/training/modules/manage-delivery-plans/",
+        "description": "Completely free with completion badge"
+      }
       ]
     },
     {
