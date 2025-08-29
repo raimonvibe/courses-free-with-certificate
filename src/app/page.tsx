@@ -321,7 +321,7 @@ export default function Home() {
         "provider": "Google Digital Garage",
         "topics": ["UX Principles", "Digital Marketing"],
         "url": "https://learndigital.withgoogle.com/digitalgarage/course/digital-marketing",
-        "description": "Learn the basics of digital marketing through 17 self-paced modules covering current topics like AI tools, video marketing, SEO, social media, and more. This beginner-friendly course takes approximately 40 hours to complete, includes practical exercises and real-world examples, and is completely free with a completion certificate and badge to add to your Skillshop and LinkedIn profiles."
+        "description": "Completely free with a completion certificate and badge to add to your Skillshop and LinkedIn profiles."
       }
       ]
     },
