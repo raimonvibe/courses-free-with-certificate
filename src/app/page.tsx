@@ -302,12 +302,12 @@ export default function Home() {
           "description": "Completely free with completion certificate"
         },
         {
-          title: "Manage Agile software delivery plans across teams",
-          provider: "Microsoft Learn",
-          topics: ["Team Management", "Agile Planning", "Software Delivery"],
-          duration: "43 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/manage-agile-software-delivery-plans-across-teams/",
-          description: "Completely free with completion certificate"
+          "title": "Manage Agile software delivery plans across teams",
+          "provider": "Microsoft Learn",
+          "topics": ["Team Management", "Agile Planning", "Software Delivery"],
+          "duration": "43 minutes",
+          "url": "https://learn.microsoft.com/en-us/training/modules/manage-delivery-plans/",
+          "description": "Completely free with completion certificate"
         }
       ]
     },
