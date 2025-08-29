@@ -316,13 +316,13 @@ export default function Home() {
       icon: <Palette className="w-6 h-6" />,
       gradient: "from-amber-500 to-orange-600",
       courses: [
-        {
-          title: "Fundamentals of Digital Marketing",
-          provider: "Google Digital Garage",
-          topics: ["UX Principles", "Digital Marketing"],
-          url: "https://learndigital.withgoogle.com/digitalgarage/course/digital-marketing",
-          description: "Completely free with completion certificate"
-        }
+       {
+        "title": "Fundamentals of Digital Marketing",
+        "provider": "Google Digital Garage",
+        "topics": ["UX Principles", "Digital Marketing"],
+        "url": "https://learndigital.withgoogle.com/digitalgarage/course/digital-marketing",
+        "description": "Learn the basics of digital marketing through 17 self-paced modules covering current topics like AI tools, video marketing, SEO, social media, and more. This beginner-friendly course takes approximately 40 hours to complete, includes practical exercises and real-world examples, and is completely free with a completion certificate and badge to add to your Skillshop and LinkedIn profiles."
+      }
       ]
     },
     {
