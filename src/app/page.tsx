@@ -231,7 +231,7 @@ export default function Home() {
           "duration": "3 hours 45 minutes",
           "url": "https://learn.microsoft.com/en-us/training/paths/azure-data-fundamentals-explore-relational-data/",
           "description": "Completely free with completion certificate"
-        }
+        },
         {
           title: "Azure Cosmos DB Development",
           provider: "Microsoft Learn",
