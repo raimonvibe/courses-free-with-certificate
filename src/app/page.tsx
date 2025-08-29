@@ -225,13 +225,13 @@ export default function Home() {
           description: "Completely free with certificate upon completion"
         },
         {
-          title: "Azure Database Fundamentals",
-          provider: "Microsoft Learn",
-          topics: ["Azure SQL Database", "Database Administration", "Data Storage"],
-          duration: "3 hours 45 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/azure-database-fundamentals/",
-          description: "Completely free with completion certificate"
-        },
+          "title": "Azure Data Fundamentals: Explore relational data in Azure",
+          "provider": "Microsoft Learn",
+          "topics": ["Azure SQL Database", "Database Administration", "Data Storage"],
+          "duration": "3 hours 45 minutes",
+          "url": "https://learn.microsoft.com/en-us/training/paths/azure-data-fundamentals-explore-relational-data/",
+          "description": "Completely free with completion certificate"
+        }
         {
           title: "Azure Cosmos DB Development",
           provider: "Microsoft Learn",
