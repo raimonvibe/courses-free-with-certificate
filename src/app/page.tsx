@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useTheme } from "next-themes";
 import { Moon, Sun, ExternalLink, BookOpen, Code, Shield, Database, Cloud, GitBranch, Brain, Users, Palette, BarChart3, TestTube, Calculator } from "lucide-react";
 
 interface Course {
@@ -20,20 +21,10 @@ interface CourseCategory {
 }
 
 export default function Home() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    const isDark = localStorage.getItem("darkMode") === "true" || 
-      (!localStorage.getItem("darkMode") && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    setDarkMode(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
-  }, []);
+  const { theme, setTheme } = useTheme();
 
   const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    localStorage.setItem("darkMode", newDarkMode.toString());
-    document.documentElement.classList.toggle("dark", newDarkMode);
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   const courseCategories: CourseCategory[] = [
@@ -386,8 +377,11 @@ export default function Home() {
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
-      <div className="container mx-auto px-4 py-8">
+    <div
+      className={`min-h-screen transition-colors duration-300 bg-[var(--background)]`}
+      suppressHydrationWarning
+    >
+      <div className="container mx-auto px-4 py-8 text-[var(--foreground)]">
         <header className="text-center mb-12">
           <div className="flex justify-between items-center mb-8">
             <div className="flex-1"></div>
@@ -396,31 +390,31 @@ export default function Home() {
               className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
               aria-label="Toggle dark mode"
             >
-              {darkMode ? (
+              {theme === "dark" ? (
                 <Sun className="w-5 h-5 text-yellow-500" />
               ) : (
                 <Moon className="w-5 h-5 text-gray-950" />
               )}
             </button>
           </div>
-          
+
           <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             <h1 className="text-5xl md:text-6xl font-bold mb-4">
               Free Software Development Courses
             </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold">
-              with Certificates
-            </h2>
+            <h2 className="text-2xl md:text-3xl font-semibold">with Certificates</h2>
           </div>
-          
-          <p className="text-lg text-gray-950 dark:text-gray-300 mt-6 max-w-3xl mx-auto">
-            A curated collection of completely free software development courses that offer certificates upon completion. 
+
+          <p className="text-lg text-[var(--muted-foreground)] mt-6 max-w-3xl mx-auto">
+            A curated collection of completely free software development courses that offer certificates upon completion.
             All courses are organized by topic and cover various aspects of software development.
           </p>
-          
-          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-950 dark:text-gray-400">
+
+          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-[var(--muted-foreground)]">
             <BookOpen className="w-4 h-4" />
-            <span>{courseCategories.reduce((total, category) => total + category.courses.length, 0)} courses available</span>
+            <span>
+              {courseCategories.reduce((total, category) => total + category.courses.length, 0)} courses available
+            </span>
           </div>
         </header>
 
@@ -431,11 +425,9 @@ export default function Home() {
                 <div className={`p-3 rounded-xl bg-gradient-to-r ${category.gradient} text-white shadow-lg`}>
                   {category.icon}
                 </div>
-                <h3 className="text-3xl font-bold text-gray-950 dark:text-white">
-                  {category.title}
-                </h3>
+                <h3 className="text-3xl font-bold text-[var(--foreground)]">{category.title}</h3>
               </div>
-              
+
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {category.courses.map((course, courseIndex) => (
                   <div
@@ -443,7 +435,7 @@ export default function Home() {
                     className="group bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden"
                   >
                     <div className={`h-2 bg-gradient-to-r ${category.gradient}`}></div>
-                    
+
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <h4 className="text-xl font-semibold text-gray-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -451,36 +443,34 @@ export default function Home() {
                         </h4>
                         <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-shrink-0 ml-2" />
                       </div>
-                      
+
                       <div className="space-y-3 mb-4">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Provider:</span>
                           <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">{course.provider}</span>
                         </div>
-                        
+
                         {course.duration && (
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Duration:</span>
                             <span className="text-sm text-gray-800 dark:text-gray-300">{course.duration}</span>
                           </div>
                         )}
-                        
+
                         <div className="flex flex-wrap gap-1">
                           {course.topics.map((topic, topicIndex) => (
                             <span
                               key={topicIndex}
-                              className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-full"
+                              className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-400 rounded-full"
                             >
                               {topic}
                             </span>
                           ))}
                         </div>
                       </div>
-                      
-                      <p className="text-sm text-gray-700 dark:text-gray-400 mb-4">
-                        {course.description}
-                      </p>
-                      
+
+                      <p className="text-sm text-gray-700 dark:text-gray-400 mb-4">{course.description}</p>
+
                       <a
                         href={course.url}
                         target="_blank"
@@ -498,62 +488,96 @@ export default function Home() {
           ))}
         </div>
 
-        <footer className="mt-12 sm:mt-16 bg-black/30 backdrop-blur-sm rounded-xl border border-purple-500/20 p-6 sm:p-8">
+        <footer className="mt-12 sm:mt-16 bg-white/10 dark:bg-black/30 dark:backdrop-blur-sm rounded-xl border border-gray-200 dark:border-purple-500/20 p-6 sm:p-8">
           <div className="text-center">
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Connect with Raimon</h3>
+            <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-4 sm:mb-6">
+              Connect with Raimon
+            </h3>
             <ul className="flex flex-wrap justify-center gap-3 sm:gap-4 icons social-grid">
               <li>
-                <a href="https://x.com/raimonvibe/" target="_blank" rel="noopener noreferrer" 
-                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-110">
+                <a
+                  href="https://x.com/raimonvibe/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-110"
+                >
                   <i className="fab fa-x-twitter text-base sm:text-lg"></i>
                   <span className="sr-only">X</span>
                 </a>
               </li>
               <li>
-                <a href="https://www.youtube.com/channel/UCDGDNuYb2b2Ets9CYCNVbuA/videos/" target="_blank" rel="noopener noreferrer"
-                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white hover:from-red-600 hover:to-red-700 transition-all duration-300 hover:scale-110">
+                <a
+                  href="https://www.youtube.com/channel/UCDGDNuYb2b2Ets9CYCNVbuA/videos/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white hover:from-red-600 hover:to-red-700 transition-all duration-300 hover:scale-110"
+                >
                   <i className="fab fa-youtube text-base sm:text-lg"></i>
                   <span className="sr-only">YouTube</span>
                 </a>
               </li>
               <li>
-                <a href="https://www.tiktok.com/@raimonvibe/" target="_blank" rel="noopener noreferrer"
-                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-800 to-black rounded-lg flex items-center justify-center text-white hover:from-gray-700 hover:to-gray-900 transition-all duration-300 hover:scale-110">
+                <a
+                  href="https://www.tiktok.com/@raimonvibe/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-800 to-black rounded-lg flex items-center justify-center text-white hover:from-gray-700 hover:to-gray-900 transition-all duration-300 hover:scale-110"
+                >
                   <i className="fab fa-tiktok text-base sm:text-lg"></i>
                   <span className="sr-only">TikTok</span>
                 </a>
               </li>
               <li>
-                <a href="https://www.instagram.com/raimonvibe/" target="_blank" rel="noopener noreferrer"
-                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center justify-center text-white hover:from-pink-600 hover:to-purple-700 transition-all duration-300 hover:scale-110">
+                <a
+                  href="https://www.instagram.com/raimonvibe/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center justify-center text-white hover:from-pink-600 hover:to-purple-700 transition-all duration-300 hover:scale-110"
+                >
                   <i className="fab fa-instagram text-base sm:text-lg"></i>
                   <span className="sr-only">Instagram</span>
                 </a>
               </li>
               <li>
-                <a href="https://medium.com/@raimonvibe/" target="_blank" rel="noopener noreferrer"
-                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg flex items-center justify-center text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 hover:scale-110">
+                <a
+                  href="https://medium.com/@raimonvibe/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg flex items-center justify-center text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 hover:scale-110"
+                >
                   <i className="fab fa-medium text-base sm:text-lg"></i>
                   <span className="sr-only">Medium</span>
                 </a>
               </li>
               <li>
-                <a href="https://github.com/raimonvibe/" target="_blank" rel="noopener noreferrer"
-                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg flex items-center justify-center text-white hover:from-gray-500 hover:to-gray-600 transition-all duration-300 hover:scale-110">
+                <a
+                  href="https://github.com/raimonvibe/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg flex items-center justify-center text-white hover:from-gray-500 hover:to-gray-600 transition-all duration-300 hover:scale-110"
+                >
                   <i className="fab fa-github text-base sm:text-lg"></i>
                   <span className="sr-only">GitHub</span>
                 </a>
               </li>
               <li>
-                <a href="https://www.linkedin.com/in/raimonvibe/" target="_blank" rel="noopener noreferrer"
-                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:scale-110">
+                <a
+                  href="https://www.linkedin.com/in/raimonvibe/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:scale-110"
+                >
                   <i className="fab fa-linkedin-in text-base sm:text-lg"></i>
                   <span className="sr-only">LinkedIn</span>
                 </a>
               </li>
               <li>
-                <a href="https://www.facebook.com/profile.php?id=61563450007849" target="_blank" rel="noopener noreferrer"
-                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 hover:scale-110">
+                <a
+                  href="https://www.facebook.com/profile.php?id=61563450007849"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 hover:scale-110"
+                >
                   <i className="fab fa-facebook-f text-base sm:text-lg"></i>
                   <span className="sr-only">Facebook</span>
                 </a>
