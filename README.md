@@ -6,7 +6,7 @@ A curated collection of completely free software development courses that offer 
 
 **[🚀 Visit Free Courses Website](https://courses-free-with-certificate.vercel.app)**
 
-![Free Courses Website](./screenshot.png)
+![Free Courses Website](./courses.png)
 
 ## ✨ Features
 
