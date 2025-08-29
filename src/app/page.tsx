@@ -490,7 +490,7 @@ export default function Home() {
 
         <footer className="mt-12 sm:mt-16 bg-white/10 dark:bg-black/30 dark:backdrop-blur-sm rounded-xl border border-gray-200 dark:border-purple-500/20 p-6 sm:p-8">
           <div className="text-center">
-            <p className="text-gray-900 dark:text-gray-400 text-sm">
+            <p className="text-lg sm:text-xl font-semibold text-neutral-700 dark:text-white mb-4 sm:mb-6">
               All courses listed are completely free and offer certificates upon completion.
               Click any course link to get started immediately.
             </p>
