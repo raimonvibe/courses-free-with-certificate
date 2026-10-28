@@ -1,592 +1,266 @@
 "use client";
 
-import { useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useTheme } from "next-themes";
-import { Moon, Sun, ExternalLink, BookOpen, Code, Shield, Database, Cloud, GitBranch, Brain, Users, Palette, BarChart3, TestTube, Calculator } from "lucide-react";
+import {
+  Moon, Sun, ExternalLink, BookOpen, Code, Shield, Database, Cloud, GitBranch, Brain,
+  BarChart3, Megaphone, Server, Briefcase, Search, Award, CalendarCheck, ArrowRight,
+} from "lucide-react";
+import {
+  CATEGORIES, COURSES, CREDENTIAL_LABELS, LAST_VERIFIED,
+  type CategoryId, type Course, type Credential,
+} from "@/data/courses";
+import { BrandIcon, type BrandName } from "@/components/BrandIcon";
 
-interface Course {
-  title: string;
-  provider: string;
-  topics: string[];
-  duration?: string;
-  url: string;
-  description: string;
+const CATEGORY_ICONS: Record<CategoryId, React.ReactNode> = {
+  frontend: <Code className="w-6 h-6" />,
+  backend: <Server className="w-6 h-6" />,
+  security: <Shield className="w-6 h-6" />,
+  data: <BarChart3 className="w-6 h-6" />,
+  cloud: <Cloud className="w-6 h-6" />,
+  devops: <GitBranch className="w-6 h-6" />,
+  databases: <Database className="w-6 h-6" />,
+  ai: <Brain className="w-6 h-6" />,
+  marketing: <Megaphone className="w-6 h-6" />,
+  career: <Briefcase className="w-6 h-6" />,
+};
+
+const CREDENTIAL_STYLES: Record<Credential, string> = {
+  certificate: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+  badge: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+  trophy: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+  "paid-exam": "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+};
+
+const SOCIAL: { href: string; label: string; icon: BrandName; tile: string }[] = [
+  { href: "https://x.com/raimonvibe/", label: "X", icon: "x", tile: "from-blue-500 to-purple-600" },
+  { href: "https://www.youtube.com/channel/UCDGDNuYb2b2Ets9CYCNVbuA/videos/", label: "YouTube", icon: "youtube", tile: "from-red-500 to-red-600" },
+  { href: "https://www.tiktok.com/@raimonvibe/", label: "TikTok", icon: "tiktok", tile: "from-gray-800 to-black" },
+  { href: "https://www.instagram.com/raimonvibe/", label: "Instagram", icon: "instagram", tile: "from-pink-500 to-orange-500" },
+  { href: "https://medium.com/@raimonvibe/", label: "Medium", icon: "medium", tile: "from-gray-700 to-gray-900" },
+  { href: "https://github.com/raimonvibe/", label: "GitHub", icon: "github", tile: "from-gray-700 to-gray-900" },
+  { href: "https://www.linkedin.com/in/raimonvibe/", label: "LinkedIn", icon: "linkedin", tile: "from-blue-600 to-blue-700" },
+  { href: "https://www.facebook.com/profile.php?id=61563450007849", label: "Facebook", icon: "facebook", tile: "from-blue-500 to-blue-600" },
+];
+
+const FILTERS: { id: "all" | Credential; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "certificate", label: "Certificates" },
+  { id: "badge", label: "Badges" },
+  { id: "trophy", label: "Trophies" },
+  { id: "paid-exam", label: "Paid exam" },
+];
+
+function formatDate(iso: string) {
+  return new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 }
 
-interface CourseCategory {
-  title: string;
-  icon: React.ReactNode;
-  courses: Course[];
-  gradient: string;
+function CourseCard({ course, gradient }: { course: Course; gradient: string }) {
+  const legacy = course.status === "legacy";
+  return (
+    <article
+      id={course.id}
+      className={`min-w-0 flex flex-col rounded-xl border shadow-lg transition-shadow duration-300 hover:shadow-2xl overflow-hidden ${
+        legacy ? "bg-gray-50 dark:bg-gray-800/60 border-gray-200 dark:border-gray-700 opacity-90" : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+      }`}
+    >
+      <div className={`h-2 bg-gradient-to-r ${legacy ? "from-gray-400 to-gray-500" : gradient}`} />
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="mb-3 flex flex-wrap gap-2">
+          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${CREDENTIAL_STYLES[course.credential]}`}>
+            {CREDENTIAL_LABELS[course.credential]}
+          </span>
+          {legacy && (
+            <span className="rounded-full bg-gray-200 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+              Legacy
+            </span>
+          )}
+        </div>
+
+        <h4 className="text-xl font-semibold text-gray-950 dark:text-white [overflow-wrap:anywhere]">{course.title}</h4>
+
+        <dl className="mt-3 space-y-1.5 text-sm">
+          <div className="flex gap-2">
+            <dt className="font-medium text-gray-700 dark:text-gray-300">Provider:</dt>
+            <dd className="font-medium text-blue-700 dark:text-blue-400">{course.provider}</dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="font-medium text-gray-700 dark:text-gray-300">Cost:</dt>
+            <dd className="text-gray-800 dark:text-gray-300">{course.cost}</dd>
+          </div>
+          {course.duration && (
+            <div className="flex gap-2">
+              <dt className="font-medium text-gray-700 dark:text-gray-300">Duration:</dt>
+              <dd className="text-gray-800 dark:text-gray-300">{course.duration}</dd>
+            </div>
+          )}
+        </dl>
+
+        <ul className="mt-3 flex flex-wrap gap-1" aria-label="Topics">
+          {course.topics.map((topic) => (
+            <li key={topic} className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-900 dark:bg-gray-700 dark:text-gray-300">
+              {topic}
+            </li>
+          ))}
+        </ul>
+
+        {course.note && <p className="mt-3 text-sm text-gray-700 dark:text-gray-400">{course.note}</p>}
+
+        {course.successor && (
+          <a
+            href={course.successor.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-blue-700 hover:underline dark:text-blue-400"
+          >
+            New version: {course.successor.title} <ArrowRight className="h-4 w-4" />
+          </a>
+        )}
+
+        <a
+          href={course.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`mt-5 inline-flex items-center justify-center gap-2 self-start rounded-lg bg-gradient-to-r px-4 py-2 text-white transition-all duration-300 hover:shadow-lg ${
+            legacy ? "from-gray-500 to-gray-600" : gradient
+          }`}
+        >
+          <BookOpen className="h-4 w-4" />
+          {legacy ? "Open legacy course" : "Start course"}
+          <ExternalLink className="h-4 w-4" />
+        </a>
+      </div>
+    </article>
+  );
 }
 
 export default function Home() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | Credential>("all");
+  const [showLegacy, setShowLegacy] = useState(false);
 
-  const toggleDarkMode = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return COURSES.filter((c) => {
+      if (!showLegacy && c.status === "legacy") return false;
+      if (filter !== "all" && c.credential !== filter) return false;
+      if (!q) return true;
+      return [c.title, c.provider, ...c.topics].some((s) => s.toLowerCase().includes(q));
+    });
+  }, [query, filter, showLegacy]);
 
-  const courseCategories: CourseCategory[] = [
-    {
-      title: "Frontend Development",
-      icon: <Code className="w-6 h-6" />,
-      gradient: "from-blue-500 to-purple-600",
-      courses: [
-        {
-          title: "Responsive Web Design Certification",
-          provider: "freeCodeCamp",
-          topics: ["HTML", "CSS", "Responsive Design", "Web Accessibility"],
-          url: "https://www.freecodecamp.org/learn/2022/responsive-web-design/",
-          description: "Completely free with certificate upon completion"
-        },
-        {
-          title: "Front End Development Libraries Certification",
-          provider: "freeCodeCamp",
-          topics: ["Bootstrap", "jQuery", "SASS", "React", "Redux"],
-          url: "https://www.freecodecamp.org/learn/front-end-development-libraries/",
-          description: "Completely free with certificate upon completion"
-        }
-      ]
-    },
-    {
-      title: "Backend Development",
-      icon: <Database className="w-6 h-6" />,
-      gradient: "from-green-500 to-teal-600",
-      courses: [
-        {
-          title: "Back End Development and APIs Certification",
-          provider: "freeCodeCamp",
-          topics: ["Node.js", "Express.js", "MongoDB", "APIs"],
-          url: "https://www.freecodecamp.org/learn/back-end-development-and-apis/",
-          description: "Completely free with certificate upon completion"
-        },
-        {
-          title: "JavaScript Algorithms and Data Structures",
-          provider: "freeCodeCamp",
-          topics: ["JavaScript", "ES6", "Regular Expressions", "Debugging", "Data Structures"],
-          url: "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/",
-          description: "Completely free with certificate upon completion"
-        },
-        {
-          title: "Foundational C# with Microsoft Certification",
-          provider: "freeCodeCamp",
-          topics: ["C#", ".NET", "Object-Oriented Programming"],
-          url: "https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/",
-          description: "Completely free with certificate upon completion"
-        }
-      ]
-    },
-    {
-      title: "Security & Cybersecurity",
-      icon: <Shield className="w-6 h-6" />,
-      gradient: "from-red-500 to-pink-600",
-      courses: [
-        {
-          title: "Information Security Certification",
-          provider: "freeCodeCamp",
-          topics: ["HelmetJS", "Python for Penetration Testing", "Information Security"],
-          url: "https://www.freecodecamp.org/learn/information-security/",
-          description: "Completely free with certificate upon completion"
-        },
-        {
-          title: "Microsoft Security, Compliance, and Identity Fundamentals",
-          provider: "Microsoft Learn",
-          topics: ["Security Fundamentals", "Compliance", "Identity Management"],
-          duration: "1 day",
-          url: "https://learn.microsoft.com/en-us/training/courses/sc-900t00/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          title: "Azure Identity and Access Security",
-          provider: "Microsoft Learn",
-          topics: ["Azure Security", "Identity Management", "Access Control"],
-          duration: "43 minutes",
-          url: "https://learn.microsoft.com/en-us/training/modules/describe-azure-identity-access-security/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          title: "Microsoft 365 Security and Compliance",
-          provider: "Microsoft Learn",
-          topics: ["Cloud Security", "Compliance Management", "Security Tools"],
-          duration: "2 hours 46 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/m365-security-compliance-capabilities/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          title: "Microsoft Copilot for Security",
-          provider: "Microsoft Learn",
-          topics: ["Security AI", "Threat Detection", "Security Analysis"],
-          duration: "24 minutes",
-          url: "https://learn.microsoft.com/en-us/training/modules/security-copilot-getting-started/",
-          description: "Completely free with completion certificate"
-        }
-      ]
-    },
-    {
-      title: "Data Science",
-      icon: <BarChart3 className="w-6 h-6" />,
-      gradient: "from-orange-500 to-red-600",
-      courses: [
-        {
-          title: "Data Analysis with Python Certification",
-          provider: "freeCodeCamp",
-          topics: ["NumPy", "Pandas", "Matplotlib", "Data Analysis"],
-          url: "https://www.freecodecamp.org/learn/data-analysis-with-python/",
-          description: "Completely free with certificate upon completion"
-        }
-      ]
-    },
-    {
-      title: "Cloud Computing",
-      icon: <Cloud className="w-6 h-6" />,
-      gradient: "from-cyan-500 to-blue-600",
-      courses: [
-        {
-          title: "AWS Cloud Quest: Cloud Practitioner",
-          provider: "AWS",
-          topics: ["Cloud Fundamentals", "AWS Services"],
-          url: "https://explore.skillbuilder.aws/learn/course/external/view/elearning/11458/aws-cloud-quest-cloud-practitioner",
-          description: "Free with AWS account, includes completion certificate"
-        },
-        {
-          title: "AWS SimuLearn: Cloud Computing Essentials",
-          provider: "AWS",
-          topics: ["Cloud Architecture", "AWS Services"],
-          url: "https://explore.skillbuilder.aws/learn",
-          description: "Free with AWS account, includes completion certificate"
-        },
-        {
-          title: "Azure Fundamentals: Cloud Concepts",
-          provider: "Microsoft Learn",
-          topics: ["Cloud Computing", "Azure Services", "Cloud Architecture"],
-          duration: "52 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          title: "Azure Fundamentals: Architecture and Services",
-          provider: "Microsoft Learn",
-          topics: ["Cloud Infrastructure", "Azure Services", "Cloud Solutions"],
-          duration: "3 hours 30 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/azure-fundamentals-describe-azure-architecture-services/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          title: "Azure Fundamentals: Security, Privacy, and Compliance",
-          provider: "Microsoft Learn",
-          topics: ["Cloud Security", "Identity Services", "Network Security"],
-          duration: "2 hours 30 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/describe-azure-management-governance/",
-          description: "Completely free with completion certificate"
-        }
-      ]
-    },
-    {
-      title: "DevOps",
-      icon: <GitBranch className="w-6 h-6" />,
-      gradient: "from-purple-500 to-indigo-600",
-      courses: [
-        {
-          title: "AWS SimuLearn: Auto-Healing and Scaling Applications",
-          provider: "AWS",
-          topics: ["Auto Scaling", "Application Management"],
-          url: "https://explore.skillbuilder.aws/learn",
-          description: "Free with AWS account, includes completion certificate"
-        },
-        {
-          title: "DevOps Engineer Introduction",
-          provider: "Microsoft Learn",
-          topics: ["DevOps Practices", "CI/CD", "Infrastructure as Code"],
-          duration: "3 hours",
-          url: "https://learn.microsoft.com/en-us/training/paths/az-400-get-started-devops-transformation-journey/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          "title": "Define and implement continuous integration",
-          "provider": "Microsoft Learn",
-          "topics": ["Continuous Integration", "Continuous Deployment", "Azure DevOps"],
-          "duration": "4 hours",
-          "url": "https://learn.microsoft.com/en-us/training/paths/az-400-define-implement-continuous-integration/",
-          "description": "Completely free with completion certificate"
-        }
-      ]
-    },
-    {
-      title: "Database Management",
-      icon: <Database className="w-6 h-6" />,
-      gradient: "from-emerald-500 to-green-600",
-      courses: [
-        {
-          title: "Relational Database Certification",
-          provider: "freeCodeCamp",
-          topics: ["PostgreSQL", "SQL", "Database Design"],
-          url: "https://www.freecodecamp.org/learn/relational-database/",
-          description: "Completely free with certificate upon completion"
-        },
-        {
-          "title": "Azure Data Fundamentals: Explore relational data in Azure",
-          "provider": "Microsoft Learn",
-          "topics": ["Azure SQL Database", "Database Administration", "Data Storage"],
-          "duration": "3 hours 45 minutes",
-          "url": "https://learn.microsoft.com/en-us/training/paths/azure-data-fundamentals-explore-relational-data/",
-          "description": "Completely free with completion certificate"
-        },
-        {
-          title: "Azure Cosmos DB Development",
-          provider: "Microsoft Learn",
-          topics: ["NoSQL Databases", "Cloud Database Development", "Data Modeling"],
-          duration: "6 hours 13 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/az-204-develop-solutions-that-use-azure-cosmos-db/",
-          description: "Completely free with completion certificate"
-        }
-      ]
-    },
-    {
-      title: "Machine Learning & AI",
-      icon: <Brain className="w-6 h-6" />,
-      gradient: "from-violet-500 to-purple-600",
-      courses: [
-        {
-          title: "Machine Learning with Python Certification",
-          provider: "freeCodeCamp",
-          topics: ["TensorFlow", "Neural Networks", "Natural Language Processing"],
-          url: "https://www.freecodecamp.org/learn/machine-learning-with-python/",
-          description: "Completely free with certificate upon completion"
-        },
-        {
-          title: "Azure AI Fundamentals",
-          provider: "Microsoft Learn",
-          topics: ["AI Fundamentals", "Machine Learning Basics", "Azure AI Services"],
-          duration: "1 day",
-          url: "https://learn.microsoft.com/en-us/training/courses/ai-900t00/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          title: "Create Machine Learning Models",
-          provider: "Microsoft Learn",
-          topics: ["Machine Learning", "Model Training", "Python"],
-          duration: "5 hours 20 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/create-machine-learn-models/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          title: "Generative AI Models in Azure Machine Learning",
-          provider: "Microsoft Learn",
-          topics: ["Generative AI", "Azure ML", "AI Models"],
-          duration: "2 hours 26 minutes",
-          url: "https://learn.microsoft.com/en-us/training/paths/work-with-generative-models-azure-machine-learning/",
-          description: "Completely free with completion certificate"
-        },
-        {
-          title: "Machine Learning Fundamentals",
-          provider: "Microsoft Learn",
-          topics: ["Machine Learning Basics", "Data Science", "AI Concepts"],
-          duration: "1 hour 54 minutes",
-          url: "https://learn.microsoft.com/en-us/training/modules/fundamentals-machine-learning/",
-          description: "Completely free with completion certificate"
-        }
-      ]
-    },
-    {
-      title: "Agile Project Management",
-      icon: <Users className="w-6 h-6" />,
-      gradient: "from-pink-500 to-rose-600",
-      courses: [
-      {
-        "title": "Choose an Agile approach to software development",
-        "provider": "Microsoft Learn",
-        "topics": ["Agile Methodology", "Software Development", "Project Management"],
-        "duration": "40 minutes",
-        "url": "https://learn.microsoft.com/en-us/training/modules/choose-an-agile-approach/",
-        "description": "Completely free with completion badge"
-      },
-      {
-        "title": "Manage Agile software delivery plans across teams",
-        "provider": "Microsoft Learn",
-        "topics": ["Team Management", "Agile Planning", "Software Delivery"],
-        "duration": "43 minutes",
-        "url": "https://learn.microsoft.com/en-us/training/modules/manage-delivery-plans/",
-        "description": "Completely free with completion badge"
-      }
-      ]
-    },
-    {
-      title: "UX Design",
-      icon: <Palette className="w-6 h-6" />,
-      gradient: "from-amber-500 to-orange-600",
-      courses: [
-       {
-        "title": "Fundamentals of Digital Marketing",
-        "provider": "Google Digital Garage",
-        "topics": ["UX Principles", "Digital Marketing"],
-        "url": "https://learndigital.withgoogle.com/digitalgarage/course/digital-marketing",
-        "description": "Completely free with a completion certificate and badge to add to your Skillshop and LinkedIn profiles."
-      }
-      ]
-    },
-    {
-      title: "Data Visualization",
-      icon: <BarChart3 className="w-6 h-6" />,
-      gradient: "from-teal-500 to-cyan-600",
-      courses: [
-        {
-          title: "Data Visualization Certification",
-          provider: "freeCodeCamp",
-          topics: ["D3.js", "JSON", "APIs", "Data Visualization Libraries"],
-          url: "https://www.freecodecamp.org/learn/data-visualization/",
-          description: "Completely free with certificate upon completion"
-        }
-      ]
-    },
-    {
-      title: "Quality Assurance",
-      icon: <TestTube className="w-6 h-6" />,
-      gradient: "from-indigo-500 to-blue-600",
-      courses: [
-        {
-          title: "Quality Assurance Certification",
-          provider: "freeCodeCamp",
-          topics: ["Chai", "Automated Testing", "Node.js Testing"],
-          url: "https://www.freecodecamp.org/learn/quality-assurance/",
-          description: "Completely free with certificate upon completion"
-        }
-      ]
-    },
-    {
-      title: "Scientific Computing",
-      icon: <Calculator className="w-6 h-6" />,
-      gradient: "from-slate-500 to-gray-600",
-      courses: [
-        {
-          title: "Scientific Computing with Python Certification",
-          provider: "freeCodeCamp",
-          topics: ["Python", "Scientific Computing Libraries", "Data Processing"],
-          url: "https://www.freecodecamp.org/learn/scientific-computing-with-python/",
-          description: "Completely free with certificate upon completion"
-        },
-        {
-          title: "College Algebra with Python Certification",
-          provider: "freeCodeCamp",
-          topics: ["Algebra", "Python Programming", "Mathematical Computing"],
-          url: "https://www.freecodecamp.org/learn/college-algebra-with-python/",
-          description: "Completely free with certificate upon completion"
-        }
-      ]
-    }
-  ];
+  const current = COURSES.filter((c) => c.status === "current").length;
+  const legacyCount = COURSES.length - current;
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-300 bg-[var(--background)]`}
-      suppressHydrationWarning
-    >
+    <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
       <div className="container mx-auto px-4 py-8 text-[var(--foreground)]">
-        <header className="text-center mb-12">
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex-1"></div>
+        <header className="mb-10 text-center">
+          <div className="mb-8 flex items-center justify-end">
             <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="rounded-lg border border-gray-200 bg-white p-2 shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800"
               aria-label="Toggle dark mode"
             >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5 text-yellow-500" />
-              ) : (
-                <Moon className="w-5 h-5 text-gray-950" />
-              )}
+              {resolvedTheme === "dark" ? <Sun className="h-5 w-5 text-yellow-500" /> : <Moon className="h-5 w-5 text-gray-950" />}
             </button>
           </div>
 
           <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">
-              Free Software Development Courses
-            </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold">with Certificates</h2>
+            <h1 className="mb-4 text-4xl font-bold sm:text-5xl md:text-6xl">Free Software Development Courses</h1>
+            <h2 className="text-2xl font-semibold md:text-3xl">with Certificates &amp; Badges</h2>
           </div>
 
-          <p className="text-lg text-[var(--muted-foreground)] mt-6 max-w-3xl mx-auto">
-            A curated collection of completely free software development courses that offer certificates upon completion.
-            All courses are organized by topic and cover various aspects of software development.
+          <p className="mx-auto mt-6 max-w-3xl text-lg text-[var(--muted-foreground)]">
+            A curated list of free courses from freeCodeCamp, Microsoft Learn, AWS and Google. Every card says honestly
+            what you get at the end: a certificate, a badge, a trophy, or a free course that prepares for a paid exam.
           </p>
 
-          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-[var(--muted-foreground)]">
-            <BookOpen className="w-4 h-4" />
-            <span>
-              {courseCategories.reduce((total, category) => total + category.courses.length, 0)} courses available
-            </span>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-[var(--muted-foreground)]">
+            <span className="flex items-center gap-2"><BookOpen className="h-4 w-4" />{current} current courses · {legacyCount} legacy</span>
+            <span className="flex items-center gap-2"><CalendarCheck className="h-4 w-4" />Links and prices last verified on {formatDate(LAST_VERIFIED)}</span>
           </div>
         </header>
 
-        <div className="grid gap-8 md:gap-12">
-          {courseCategories.map((category, categoryIndex) => (
-            <section key={categoryIndex} className="space-y-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className={`p-3 rounded-xl bg-gradient-to-r ${category.gradient} text-white shadow-lg`}>
-                  {category.icon}
+        <section aria-label="Find a course" className="mx-auto mb-10 max-w-4xl space-y-4">
+          <label className="relative block">
+            <span className="sr-only">Search courses</span>
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by title, provider or topic (e.g. React, Azure, SQL)"
+              className="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 text-base text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            />
+          </label>
+          <div className="flex flex-wrap items-center gap-2">
+            <Award className="h-5 w-5 text-[var(--muted-foreground)]" aria-hidden="true" />
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                aria-pressed={filter === f.id}
+                className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                  filter === f.id
+                    ? "border-blue-600 bg-blue-600 text-white"
+                    : "border-gray-300 bg-white text-gray-800 hover:border-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+            <label className="ml-auto flex cursor-pointer items-center gap-2 text-sm text-[var(--muted-foreground)]">
+              <input type="checkbox" checked={showLegacy} onChange={(e) => setShowLegacy(e.target.checked)} className="h-4 w-4 accent-blue-600" />
+              Show legacy courses ({legacyCount})
+            </label>
+          </div>
+        </section>
+
+        <div className="grid gap-12">
+          {CATEGORIES.map((category) => {
+            const courses = visible.filter((c) => c.category === category.id);
+            if (courses.length === 0) return null;
+            return (
+              <section key={category.id} id={category.id} className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className={`rounded-xl bg-gradient-to-r p-3 text-white shadow-lg ${category.gradient}`}>{CATEGORY_ICONS[category.id]}</div>
+                  <h3 className="text-2xl font-bold text-[var(--foreground)] sm:text-3xl">{category.title}</h3>
                 </div>
-                <h3 className="text-3xl font-bold text-[var(--foreground)]">{category.title}</h3>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {category.courses.map((course, courseIndex) => (
-                  <div
-                    key={courseIndex}
-                    className="group bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden"
-                  >
-                    <div className={`h-2 bg-gradient-to-r ${category.gradient}`}></div>
-
-                    <div className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <h4 className="text-xl font-semibold text-gray-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          {course.title}
-                        </h4>
-                        <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-shrink-0 ml-2" />
-                      </div>
-
-                      <div className="space-y-3 mb-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Provider:</span>
-                          <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">{course.provider}</span>
-                        </div>
-
-                        {course.duration && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Duration:</span>
-                            <span className="text-sm text-gray-800 dark:text-gray-300">{course.duration}</span>
-                          </div>
-                        )}
-
-                        <div className="flex flex-wrap gap-1">
-                          {course.topics.map((topic, topicIndex) => (
-                            <span
-                              key={topicIndex}
-                              className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-400 rounded-full"
-                            >
-                              {topic}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-gray-700 dark:text-gray-400 mb-4">{course.description}</p>
-
-                      <a
-                        href={course.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${category.gradient} text-white rounded-lg hover:shadow-lg transition-all duration-300 text-sm font-medium w-full justify-center`}
-                      >
-                        <BookOpen className="w-4 h-4" />
-                        Start Course
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {courses.map((course) => (
+                    <CourseCard key={course.id} course={course} gradient={category.gradient} />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+          {visible.length === 0 && (
+            <p className="text-center text-[var(--muted-foreground)]">No courses match. Try another search or filter.</p>
+          )}
         </div>
 
-        <footer className="mt-12 sm:mt-16 bg-white/10 dark:bg-black/30 dark:backdrop-blur-sm rounded-xl border border-gray-200 dark:border-purple-500/20 p-6 sm:p-8">
+        <footer className="mt-12 rounded-xl border border-gray-200 bg-white/10 p-6 sm:mt-16 sm:p-8 dark:border-purple-500/20 dark:bg-black/30 dark:backdrop-blur-sm">
           <div className="text-center">
-            <p className="text-lg sm:text-xl font-semibold text-neutral-700 dark:text-white mb-4 sm:mb-6">
-              All courses listed are completely free and offer certificates upon completion.
-              Click any course link to get started immediately.
+            <p className="mb-4 text-lg font-semibold text-neutral-700 sm:mb-6 sm:text-xl dark:text-white">
+              All courses listed are free to take. The label on each card says what you receive when you finish.
             </p>
-            <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-4 sm:mb-6">
-              Connect with Raimon
-            </h3>
-            
-            <ul className="flex flex-wrap justify-center gap-3 sm:gap-4 icons social-grid">
-              <li>
-                <a
-                  href="https://x.com/raimonvibe/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-110"
-                >
-                  <i className="fab fa-x-twitter text-base sm:text-lg"></i>
-                  <span className="sr-only">X</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.youtube.com/channel/UCDGDNuYb2b2Ets9CYCNVbuA/videos/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white hover:from-red-600 hover:to-red-700 transition-all duration-300 hover:scale-110"
-                >
-                  <i className="fab fa-youtube text-base sm:text-lg"></i>
-                  <span className="sr-only">YouTube</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.tiktok.com/@raimonvibe/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-800 to-black rounded-lg flex items-center justify-center text-white hover:from-gray-700 hover:to-gray-900 transition-all duration-300 hover:scale-110"
-                >
-                  <i className="fab fa-tiktok text-base sm:text-lg"></i>
-                  <span className="sr-only">TikTok</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.instagram.com/raimonvibe/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center justify-center text-white hover:from-pink-600 hover:to-purple-700 transition-all duration-300 hover:scale-110"
-                >
-                  <i className="fab fa-instagram text-base sm:text-lg"></i>
-                  <span className="sr-only">Instagram</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://medium.com/@raimonvibe/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg flex items-center justify-center text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 hover:scale-110"
-                >
-                  <i className="fab fa-medium text-base sm:text-lg"></i>
-                  <span className="sr-only">Medium</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://github.com/raimonvibe/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg flex items-center justify-center text-white hover:from-gray-500 hover:to-gray-600 transition-all duration-300 hover:scale-110"
-                >
-                  <i className="fab fa-github text-base sm:text-lg"></i>
-                  <span className="sr-only">GitHub</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.linkedin.com/in/raimonvibe/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:scale-110"
-                >
-                  <i className="fab fa-linkedin-in text-base sm:text-lg"></i>
-                  <span className="sr-only">LinkedIn</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.facebook.com/profile.php?id=61563450007849"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 hover:scale-110"
-                >
-                  <i className="fab fa-facebook-f text-base sm:text-lg"></i>
-                  <span className="sr-only">Facebook</span>
-                </a>
-              </li>
+            <h3 className="mb-4 text-lg font-semibold text-neutral-900 sm:mb-6 sm:text-xl dark:text-white">Connect with Raimon</h3>
+            <ul className="flex flex-wrap justify-center gap-3 sm:gap-4">
+              {SOCIAL.map((s) => (
+                <li key={s.href}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r text-white transition-all duration-300 hover:scale-110 sm:h-12 sm:w-12 ${s.tile}`}
+                  >
+                    <BrandIcon name={s.icon} className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="sr-only">{s.label}</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </footer>

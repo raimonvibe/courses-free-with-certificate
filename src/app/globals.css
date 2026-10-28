@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Tailwind v4 points `dark:` at prefers-color-scheme by default. next-themes
+   switches a .dark class on <html>, so `dark:` must follow that class or the
+   toggle only changes half the colours. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f9fafb; /* Light gray-white for better readability */
   --foreground: #0f172a; /* Slate-900, near-black */

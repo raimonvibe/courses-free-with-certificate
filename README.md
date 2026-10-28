@@ -1,6 +1,6 @@
 # Free Software Development Courses with Certificates
 
-A curated collection of completely free software development courses that offer certificates upon completion. This Next.js website showcases 34 courses organized by topic, covering various aspects of software development from frontend to backend, security, data science, and cloud computing.
+A curated, regularly verified collection of free software development courses. Every course says honestly what you get when you finish: a certificate, a badge, a trophy, or a free course that prepares for a paid exam. 27 current courses (plus 11 legacy ones) from freeCodeCamp, Microsoft Learn, AWS and Google, organised by topic.
 
 ## 🌐 Live Demo
 
@@ -10,19 +10,19 @@ A curated collection of completely free software development courses that offer 
 
 ## ✨ Features
 
-- **34 Free Courses**: Comprehensive collection of courses with certificates
-- **13 Categories**: Organized by Frontend, Backend, Security, Data Science, Cloud Computing, and more
-- **Dark Mode Toggle**: Seamless light/dark theme switching with localStorage persistence
-- **Beautiful UI**: Linear gradient styling, hover effects, and responsive design
-- **Lucide Icons**: Category-specific icons for enhanced visual appeal
-- **Interactive Cards**: Each course displays provider, topics, duration, and direct links
-- **Verified Links**: All course links tested and verified to work correctly
+- **27 current free courses** in 10 categories, plus 11 legacy freeCodeCamp certifications (hidden by default, each with a link to its new version)
+- **Honest labels**: *Free certificate*, *Free badge*, *Free trophy* or *Free course · paid exam* on every card
+- **Search** by title, provider or topic, and **filter** by what you receive
+- **Last verified** date on the page; every link, price and credential checked on 2026-10-28
+- **Weekly link check**: a GitHub Action checks every course URL and opens an issue when one breaks
+- **Dark mode** toggle that follows your system setting by default
+- **Responsive**: phone, tablet and desktop
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 20+ 
 - pnpm (recommended) or npm/yarn
 
 ### Installation
@@ -60,21 +60,17 @@ npm run dev
 
 ## 📚 Course Categories
 
-The website features courses in the following categories:
+Frontend Development · Backend Development · Security & Cybersecurity · Data Science & Visualization · Cloud Computing · DevOps · Database Management · Machine Learning & AI · Digital Marketing · Career Skills
 
-- 🎨 **Frontend Development** (2 courses)
-- 🗄️ **Backend Development** (3 courses) 
-- 🛡️ **Security & Cybersecurity** (5 courses)
-- 📊 **Data Science** (1 course)
-- ☁️ **Cloud Computing** (4 courses)
-- 🔧 **DevOps & Infrastructure** (3 courses)
-- 🧠 **Machine Learning & AI** (4 courses)
-- 👥 **Soft Skills & Management** (2 courses)
-- 🎨 **Design & UX** (2 courses)
-- 📈 **Business & Analytics** (3 courses)
-- 🧪 **Quality Assurance** (2 courses)
-- 🔢 **Mathematics & Algorithms** (2 courses)
-- 📱 **Mobile Development** (1 course)
+## ➕ Adding or updating a course
+
+All courses live in **`src/data/courses.ts`**; the page only renders that file. Add an entry with:
+
+- `credential`: `certificate`, `badge`, `trophy` or `paid-exam` (be honest: Microsoft Learn paths give a trophy, not a certificate)
+- `status`: `current`, or `legacy` with a `successor` link when a provider replaces a course
+- `lastVerified`: the day you checked the link and the price yourself
+
+The weekly link check (`.github/workflows/link-check.yml`) reads the URLs from that file automatically.
 
 ## 🌙 Dark Mode
 
